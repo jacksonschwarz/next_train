@@ -33,7 +33,7 @@ let callback=function(response){
 
     
 }
-let url="http://realtime.mbta.com/developer/api/v2/predictionsbystop?api_key=wX9NwuHnZU2ToO7GmGR9uw&stop=place-lngmd&format=json"
+let url="https://realtime.mbta.com/developer/api/v2/predictionsbystop?api_key=wX9NwuHnZU2ToO7GmGR9uw&stop=place-lngmd&format=json"
 let data=[]
 let check=function(){
     httpGet(url);
