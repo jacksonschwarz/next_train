@@ -14,27 +14,37 @@ let httpGet=function(url){
     xmlHttp.open("GET", url, true);
     xmlHttp.send(null);
 }
+let hasError=false;
 let callback=function(response){
+
     data=JSON.parse(response);
-    console.log(data.mode[0].route[0])
     if(data.mode[0].route[0].direction[1]){
-        let timeUntilArrival=Math.round(data.mode[0].route[0].direction[1].trip[0].pre_away/60)
-        let timeOfArrival=new Date(data.mode[0].route[0].direction[1].trip[0].pre_dt*1000)
-        document.write(`<h1 style="font-family:sans-serif;font-size:65px">
-        The next train arrives at <span style="color:green">Longwood Medical Area</span> in <br><span style="color:blue">${timeUntilArrival}</span> minutes, or at <span style="color:blue">${timeOfArrival.toLocaleString('en-US', { hour: 'numeric',minute:'numeric', hour12: true })}</span>
-        </h1>`)
+        hasError=false
+        let min={pre_away:0};
+        for(let vehicle of data.mode[0].route[0].direction[1].trip){
+            if(min.pre_away < vehicle.pre_away){
+                min=vehicle
+            }
+        }
+        let timeUntilArrival=Math.round(min.pre_away/60)
+        let timeOfArrival=new Date(min.pre_dt*1000)
+        document.getElementById("timeUntilArrival").innerHTML=timeUntilArrival
+        document.getElementById("timeOfArrival").innerHTML=timeOfArrival.toLocaleString('en-US', { hour: 'numeric',minute:'numeric', hour12: true })
+        document.getElementById("error-text").innerHTML="";
     }
     else{
-        document.write(`<h1 style="font-family:sans-serif;font-size:65px">
-            There are currently no trains on schedule to arrive at Longwood Medical Area
-        </h1>
-        `)
+        document.getElementById("error-text").innerHTML="There are currently no trains scheduled to arrive at Longwood Medical Area";
     }
 
     
 }
-let url="https://realtime.mbta.com/developer/api/v2/predictionsbystop?api_key=wX9NwuHnZU2ToO7GmGR9uw&stop=place-lngmd&format=json"
+let url="https://realtime.mbta.com/developer/api/v2/predictionsbystop?api_key=DXNtGY7bd0yDb9S6MRuDKA&stop=place-lngmd&format=json"
 let data=[]
+let doneOnce=false;
 let check=function(){
     httpGet(url);
+    setInterval(function(){
+        httpGet(url)
+    },15*1000)
+
 }
